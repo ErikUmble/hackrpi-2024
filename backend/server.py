@@ -1,21 +1,12 @@
-from firebase import firebase
 from flask import Flask
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-FIREBASE_KEY = os.getenv("FIREBASE_KEY")
-
-firebase = firebase.FirebaseApplication(FIREBASE_KEY, None)
+from load_firebase import experiences
 
 app = Flask(__name__)
 
 # direct users to recording an experience or querying for one
 @app.route('/')
 def home():
-    experiences = firebase.get('/experiences', None)
-    return str(experiences)
+    return str(experiences.get('testkey'))
     
 # query for experiences
 # TODO: include conversation with ChatGPT and maps API
