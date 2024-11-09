@@ -1,2 +1,1 @@
-requests
-python-firebase
+-r requirements/production.txt
