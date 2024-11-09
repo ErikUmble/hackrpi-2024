@@ -2,3 +2,7 @@ python-dotenv
 requests
 python-firebase
 openai
+flask
+firebase-admin
+google-cloud-texttospeech
+google-cloud-speech
