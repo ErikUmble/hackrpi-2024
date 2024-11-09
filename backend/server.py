@@ -1,4 +1,4 @@
-from flask import Flask, session, request
+from flask import Flask, session, request, send_from_directory
 from load_firebase import experiences
 from text_to_speech import text_to_speech
 from speech_to_text import speech_to_text
@@ -9,8 +9,19 @@ import base64
 
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/dist/spa')
 app.secret_key=os.getenv('FLASK_KEY')
+
+# serve Quasar frontend
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_frontend(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        # Serve static files for the frontend
+        return send_from_directory(app.static_folder, path)
+    else:
+        # Serve index.html for all other routes (Single Page App)
+        return send_from_directory(app.static_folder, "index.html")
 
 # handle adding a new experience or querying for an experience
 # handles all api calls
