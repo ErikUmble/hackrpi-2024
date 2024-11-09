@@ -12,4 +12,4 @@ def text_to_speech(text):
     # Generate the audio content
     response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
 
-    return response
+    return response.audio_content

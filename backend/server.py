@@ -1,4 +1,11 @@
-from flask import Flask, session, request, send_from_directory
+from flask import (
+    Flask,
+    session,
+    request,
+    send_from_directory,
+    make_response,
+    jsonify,
+)
 from load_firebase import experiences
 from text_to_speech import text_to_speech
 from speech_to_text import speech_to_text
@@ -29,15 +36,23 @@ def serve_frontend(path):
 def api():
     if 'uuid' not in session:
         # assign unique user id
-        session['uuid'] = base64.b64encode(secrets.token_bytes(32).decode('utf-8'))
-    if 'audio' in request and 'location' in request:
+        session['uuid'] = base64.b64encode(secrets.token_bytes(32))
+    if 'audio' in request.files and 'longitude' in request.form and 'latitude' in request.form:
         # pass audio through speech to text
-        audio_mp3_bytes = request['audio']
-        text_results = speech_to_text(audio_mp3_bytes)
+        audio_wav_file = request.files['audio']
+        audio_wav_bytes = audio_wav_file.read()
+        text_results = speech_to_text(audio_wav_bytes)
         if len(text_results) == 0:
             return 'We had trouble converting that audio', 400
         text_result = text_results[0] # take the most confident text result
+        text_transcript = text_result.alternatives[0].transcript
 
+        '''
+        # for testing, convert text back into audio and return
+        audio_response = text_to_speech(text_transcript)
+        return make_response(audio_response)
+        '''
+            
         if session.get('enroute', False):
             # TODO: continue conversation about searching for experience
             pass
@@ -57,4 +72,4 @@ def api():
     return 'Missing audio or location in request', 400
 
 if __name__ == '__main__':  
-    app.run()
+    app.run(debug=True)
