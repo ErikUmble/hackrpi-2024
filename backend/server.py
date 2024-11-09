@@ -13,6 +13,8 @@ import os
 from dotenv import load_dotenv
 import secrets
 import base64
+from maps import Location
+from assistant import query
 
 load_dotenv()
 
@@ -46,6 +48,7 @@ def api():
             return 'We had trouble converting that audio', 400
         text_result = text_results[0] # take the most confident text result
         text_transcript = text_result.alternatives[0].transcript
+        location = Location(request.form['latitude'], request.form['longitude'])
 
         '''
         # for testing, convert text back into audio and return
@@ -57,17 +60,13 @@ def api():
             # TODO: continue conversation about searching for experience
             pass
         else:
-            # determine intent
-            # TODO: use ChatGPT
+            response = query(text_transcript, session, location)
             
             # if intent is to get directions, set session['enroute'] to True
-
-            # TODO: store user audio and ChatGPT response
-            
-            # TODO: return audio to respond with
-
-            pass
-
+            if response.intent == "directions":
+                session['enroute'] = True
+                # TODO: get directions
+            return make_response(text_to_speech(response.reply))
 
     return 'Missing audio or location in request', 400
 

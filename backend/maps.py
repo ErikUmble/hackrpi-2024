@@ -6,6 +6,14 @@ load_dotenv()
 
 MAPS_API_KEY = os.getenv("MAPS_API_KEY")
 
+class Location:
+    def __init__(self, lat, lng):
+        self.lat = lat
+        self.lng = lng
+
+    def __str__(self):
+        return f"{self.lat},{self.lng}"
+
 def get_nearby_places(lat, lng, radius, type):
     """
     Fetches nearby places using the older Google Maps Places API.
