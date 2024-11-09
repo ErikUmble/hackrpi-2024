@@ -1,8 +1,13 @@
 from firebase import firebase
 from flask import Flask
-import local
+import os
+from dotenv import load_dotenv
 
-firebase = firebase.FirebaseApplication(local.FIREBASE_KEY, None)
+load_dotenv()
+
+FIREBASE_KEY = os.getenv("FIREBASE_KEY")
+
+firebase = firebase.FirebaseApplication(FIREBASE_KEY, None)
 
 app = Flask(__name__)
 
