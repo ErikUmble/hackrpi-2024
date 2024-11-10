@@ -12,7 +12,7 @@ def speech_to_text(audio_bytes):
 
     config = speech.RecognitionConfig(
         language_code='en-US',
-        alternative_language_codes=["es-ES", "fr-FR", "zh-CN", "ar-SA"],
+        alternative_language_codes=["es-ES", "fr-FR", "zh-CN"],
     )
 
     audio = speech.RecognitionAudio(
