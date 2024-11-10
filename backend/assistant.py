@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 import json
 from maps import get_nearby_places
+import firebase_db
 
 load_dotenv()
 client = OpenAI()
@@ -49,13 +50,15 @@ def supply_places(places, session):
     data = []
     for p in places:
         if p.get('business_status') == 'OPERATIONAL':
+            experiences = firebase_db.experiences.order_by_child('location').equal_to(p.get('place_id')).get().values()
+            transcriptions = [e['transcription'] for e in experiences]
             data.append({
-                "place_id": p.get('place_id'),
                 "name": p.get('name'),
                 "rating": p.get('rating'),
-                'opening_hours': p.get('opening_hours'),
+                'open_status': p.get('opening_hours'),
                 "types": p.get('types'),
                 "user_ratings_total": p.get('user_ratings_total'),
+                'experiences': str(transcriptions),
                 "vicinity": p.get('vicinity'),
             })
     session['messages'].append({"role": "system", "content": "places: " + json.dumps(data)})

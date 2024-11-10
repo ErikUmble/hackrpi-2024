@@ -1,0 +1,1 @@
+docker run --name flask_app -p 5000:5000 --privileged $(docker build -q .)
