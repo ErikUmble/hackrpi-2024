@@ -9,6 +9,7 @@ services:
       - reverse_proxy_net
     env_file:
       - .env
+      
   reverse_proxy:
     image: nginx:latest
     container_name: nginx_reverse_proxy
