@@ -1,22 +1,40 @@
-# Use the official Python image with a specific version
+# Build stage for frontend
+FROM node:16 as frontend-builder
+
+WORKDIR /app/frontend
+
+# Install quasar CLI globally
+RUN npm install -g @quasar/cli
+
+# Copy frontend package files first to leverage Docker cache
+COPY frontend/package*.json ./
+RUN npm install
+
+# Copy the rest of the frontend source
+COPY frontend .
+
+# Build the Quasar app
+RUN npx quasar build
+
+# Final stage
 FROM python:3.9-slim
 
-# Set environment variables to prevent Python from writing pyc files to disk
 ENV PYTHONUNBUFFERED=1
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy all files from the current directory to the container
-COPY . .
+# Copy the built frontend from previous stage
+COPY --from=frontend-builder /app/frontend/dist/spa /app/frontend/dist/spa
+
+# Copy backend files
+COPY backend /app/backend
+COPY .env /app/.env
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# Expose port 9000 for the Flask app
 EXPOSE 9000
 
 ENV GOOGLE_APPLICATION_CREDENTIALS=able-81a4e-e694abda18d2.json
 
-# Command to run the Flask app
-CMD ["python", "backend/server.py", "--host=0.0.0.0", "--port=9000"]
+CMD ["python", "backend/server.py"]
