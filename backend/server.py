@@ -5,7 +5,7 @@ from flask import (
     send_from_directory,
     make_response,
 )
-from text_to_speech import text_to_speech
+from text_to_speech import text_to_speech, sorry_message_in_language
 from speech_to_text import speech_to_text
 import os
 from dotenv import load_dotenv
@@ -71,7 +71,7 @@ def api():
                 experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place))
                 # for now, choose a random experience to share
                 if experiences is None or len(experiences) == 0:
-                    return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet', language_code))
+                    return make_response(sorry_message_in_language(language_code))
                 # TODO: have a better way to choose
                 chosen_experience = random.choice(experiences)
                 return make_response(chosen_experience['audio'])
@@ -91,4 +91,4 @@ def api():
 
 
 if __name__ == '__main__':  
-    app.run(debug=True)
+    app.run(debug=True, port=9000)

@@ -13,3 +13,11 @@ def text_to_speech(text, language_code):
     response = tts_client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
 
     return response.audio_content
+
+def sorry_message_in_language(language_code):
+    try:
+        with open(f'backend/sorry_{language_code}.mp3', 'rb') as audio_file:
+            # return audio bytes
+            return audio_file.read()
+    except IOError:
+        return text_to_speech('Sorry, we do not have any experiences for that location yet', 'en-us')
