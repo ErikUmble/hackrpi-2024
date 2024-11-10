@@ -2,11 +2,11 @@ from google.cloud import texttospeech
 
 tts_client = texttospeech.TextToSpeechClient()
 
-def text_to_speech(text):
+def text_to_speech(text, language_code):
     # configure request
     synthesis_input = texttospeech.SynthesisInput(text=text.replace('*', ''))
     # TODO: have users select voice gender
-    voice = texttospeech.VoiceSelectionParams(language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.FEMALE)
+    voice = texttospeech.VoiceSelectionParams(language_code=language_code, ssml_gender=texttospeech.SsmlVoiceGender.FEMALE)
     audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
 
     # Generate the audio content

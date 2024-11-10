@@ -47,6 +47,7 @@ def api():
         if len(text_results) == 0:
             return 'We had trouble converting that audio', 400
         text_transcript = ''.join([result.alternatives[0].transcript for result in text_results]) # take the most confident text result
+        language_code = text_results[0].language_code
         print(text_results)
         print(text_transcript)
         location = Location(request.form['latitude'], request.form['longitude'])
@@ -59,7 +60,7 @@ def api():
             
         if session.get('enroute', False):
             session['enroute'] = False
-            return make_response(text_to_speech("I'm sorry, I still need to look up the route."))
+            return make_response(text_to_speech("I'm sorry, I still need to look up the route.", language_code))
             # TODO: continue conversation about searching for experience
             pass
         else:
@@ -70,7 +71,7 @@ def api():
                 experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place))
                 # for now, choose a random experience to share
                 if experiences is None or len(experiences) == 0:
-                    return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet'))
+                    return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet', language_code))
                 # TODO: have a better way to choose
                 chosen_experience = random.choice(experiences)
                 return make_response(chosen_experience['audio'])
@@ -84,7 +85,7 @@ def api():
                         text_transcript,
                         get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
                     )
-                return make_response(text_to_speech(response.reply))
+                return make_response(text_to_speech(response.reply, language_code))
 
     return 'Missing audio or location in request', 400
 
