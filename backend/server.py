@@ -4,7 +4,9 @@ from flask import (
     request,
     send_from_directory,
     make_response,
+    jsonify,
 )
+from urllib.parse import quote
 from text_to_speech import text_to_speech, sorry_message_in_language
 from speech_to_text import speech_to_text
 import os
@@ -58,34 +60,36 @@ def api():
         return make_response(audio_response)
         '''
             
-        if session.get('enroute', False):
-            session['enroute'] = False
-            return make_response(text_to_speech("I'm sorry, I still need to look up the route.", language_code))
-            # TODO: continue conversation about searching for experience
-            pass
-        else:
-            response = query(text_transcript, session, location)
+        response = query(text_transcript, session, location)
 
-            # if intent is to get directions, set session['enroute'] to True
-            if response.intent == "get_experience":
-                experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place))
-                # for now, choose a random experience to share
-                if experiences is None or len(experiences) == 0:
-                    return make_response(sorry_message_in_language(language_code))
-                # TODO: have a better way to choose
-                chosen_experience = random.choice(experiences)
-                return make_response(chosen_experience['audio'])
-            else:
-                if response.intent == "directions":
-                    session['enroute'] = True
-                    # TODO: get directions
-                elif response.intent == "experience_details":
-                    firebase_db.submit_experience(
-                        audio_wav_bytes,
-                        text_transcript,
-                        get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
+        # if intent is to get directions, set session['enroute'] to True
+        if response.intent == "get_experience":
+            experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0])
+            # for now, choose a random experience to share
+            if experiences is None or len(experiences) == 0:
+                return make_response(sorry_message_in_language(language_code))
+            # TODO: have a better way to choose
+            chosen_experience = random.choice(experiences)
+            return make_response(chosen_experience['audio'])
+        else:
+            if response.intent == "directions":
+                place_id, name = get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
+                google_maps_link = f'https://www.google.com/maps/dir/?api=1&destination={quote(name)}&destination_place_id={quote(place_id)}&travelmode=walking&dir_action=navigate'
+                return make_response(
+                    jsonify(
+                        {
+                            'link': google_maps_link,
+                        }
                     )
-                return make_response(text_to_speech(response.reply, language_code))
+                )
+            elif response.intent == "experience_details":
+                firebase_db.submit_experience(
+                    audio_wav_bytes,
+                    text_transcript,
+                    get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0]
+                )
+
+            return make_response(text_to_speech(response.reply, language_code))
 
     return 'Missing audio or location in request', 400
 

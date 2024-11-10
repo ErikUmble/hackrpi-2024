@@ -92,13 +92,21 @@ const sendRecording = async (blob: Blob): Promise<void> => {
     // Replace with your API endpoint
     const response = await fetch('/api', {
       method: 'POST',
+      mode: "cors",
       body: formData
     })
 
     if (response.ok) {
       recordingStatus.value = 'Recording sent successfully'
-      const audioBlob = await response.blob();
-      playAudio(audioBlob);
+      const contentType = response.headers.get('content-type');
+      if (contentType?.includes("application/json")) {
+        const jsonResponse = await response.json();
+        console.log(`redirecting to ${jsonResponse.link}`);
+        window.open(jsonResponse.link, '_blank');
+      } else if (contentType?.includes("text/html")) {
+        const audioBlob = await response.blob();
+        playAudio(audioBlob);
+      }
     } else {
       throw new Error('Failed to send recording')
     }

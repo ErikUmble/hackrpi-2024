@@ -94,6 +94,7 @@ def get_matching_place(lat, lng, query):
         "query": query,
         "location": f"{lat},{lng}",
         "key": MAPS_API_KEY,
+        "radius": 10000,
     }
 
     try:
@@ -108,11 +109,12 @@ def get_matching_place(lat, lng, query):
             if places:
                 best_match = places[0]  # Best match is typically the first result
                 place_id = best_match.get("place_id")
-                return place_id
+                name = best_match.get("name")
+                return place_id, name
         else:
             print(f"Error: {data['status']}")
-            return None
+            return None, None
         
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
-        return None
+        return None, None
