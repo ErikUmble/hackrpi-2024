@@ -14,6 +14,7 @@ const locationStatus = ref<string>('Getting location...')
 const currentLocation = ref<Location | null>(null)
 const audioChunks = ref<Blob[]>([])
 const watchPositionId = ref<number | null>(null)
+const playingAudio = ref<HTMLAudioElement | null>(null)
 
 // Location handling
 const setupLocationWatcher = (): void => {
@@ -60,6 +61,9 @@ const startRecording = (): void => {
     mediaRecorder.value.start()
     isRecording.value = true
     recordingStatus.value = 'Recording...'
+    if (playingAudio.value) {
+      playingAudio.value.pause()
+    }
   }
 }
 
@@ -75,6 +79,7 @@ const playAudio = (blob: Blob): void => {
   const audioUrl = URL.createObjectURL(blob)
   const audio = new Audio(audioUrl)
   audio.play()
+  playingAudio.value = audio;
 }
 
 const sendRecording = async (blob: Blob): Promise<void> => {
