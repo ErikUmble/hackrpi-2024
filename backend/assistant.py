@@ -27,6 +27,7 @@ initial_messages = (
             - "reply" should be the conversational response to the user's query; this will be provided as audio via text-to-speech, so aim to use simple text, be concise, and give the user an option to ask for more information.
             - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "experience_details" for when the person is describing food or thoughts about their experience at a place, or "get_experience" for retrieving an experience. 
             - "type" should be the type of place (such as "restaurant", "park", MUST BE from the list below), if applicable.
+            - "distance" in meters should be the radius of the search area for places. Assume 2000 by default, and adjust if the user is curious about more options or specifies that they want a shorter walk. Do not go above 10000 or below 500.
             - "place" should be the name of the specific location the user is interested in, if any.
 
             Place types: {", ".join(place_types)}
@@ -41,6 +42,7 @@ class Response(BaseModel):
     intent: str
     place: str
     type: str
+    distance: int
 
 def supply_places(places, session):
     # filter place data to the relevant fields for assistant
@@ -79,7 +81,8 @@ def query(text, session, location=None, system=False):
     if assistant_response.parsed.intent == "get_places" and assistant_response.parsed.type and not system:
         if location is None:
             raise ValueError("Location is required to get places.") # TODO: handle this more gracefully
-        supply_places(get_nearby_places(location.lat, location.lng, 10000, assistant_response.parsed.type), session)
+        radius = max(min(2000 or assistant_response.parsed.distance, 10000), 500)
+        supply_places(get_nearby_places(location.lat, location.lng, radius, assistant_response.parsed.type), session)
         return query("Please summarize those places, prioritizing any that seem most relevant to the kind of place the user is looking for.", session, location, system=True)
     
     return assistant_response.parsed
