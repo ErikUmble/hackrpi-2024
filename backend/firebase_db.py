@@ -17,6 +17,8 @@ experiences = db.reference('experiences')
 
 # submit an experience
 def submit_experience(original_audio, transcribed, location):
+    if location is None:
+        return
     experiences.push(
         {
             'audio': base64.b64encode(original_audio).decode('utf8'),
@@ -26,6 +28,8 @@ def submit_experience(original_audio, transcribed, location):
     )
 
 def get_experiences(location):
+    if location is None:
+        return None
     results = list(experiences.order_by_child('location').equal_to(location).get().values())
     for index in range(len(results)):
         results[index]['audio'] = base64.b64decode(results[index]['audio'])

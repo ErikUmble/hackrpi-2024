@@ -68,7 +68,7 @@ def api():
             if response.intent == "get_experience":
                 experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place))
                 # for now, choose a random experience to share
-                if len(experiences) == 0:
+                if experiences is None or len(experiences) == 0:
                     return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet'))
                 # TODO: have a better way to choose
                 chosen_experience = random.choice(experiences)

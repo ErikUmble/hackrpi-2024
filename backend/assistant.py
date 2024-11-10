@@ -21,12 +21,13 @@ initial_messages = (
             unless the user is unhappy with the current options or want a different type of place options. If the user is asking if they can submit an
             experience, the intent should be "info" and you should expect details about the experience in the following response.
 
-            - "reply" should be the conversational response to the user's query.
+            - "reply" should be the conversational response to the user's query; this will be provided as audio via text-to-speech, so aim to use simple text, be concise, and give the user an option to ask for more information.
             - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "experience_details" for when the person is describing food or thoughts about their experience, or "get_experience" for retrieving an experience. 
             - "type" should be the type of place (such as "restaurant", "park", MUST BE from the list below), if applicable.
             - "place" should be the name of the specific location the user is interested in, if any.
 
             Place types: {", ".join(place_types)}
+            Please only specify "get_places" as the intent if you know the "type" of place the user is interested in.
             """
     },
 )
@@ -71,7 +72,7 @@ def query(text, session, location=None, system=False):
         return None
     session['messages'].append({"role": "assistant", "content": assistant_response.parsed.reply})
     print(assistant_response.parsed)
-    if assistant_response.parsed.intent == "get_places" and not system:
+    if assistant_response.parsed.intent == "get_places" and assistant_response.parsed.type and not system:
         if location is None:
             raise ValueError("Location is required to get places.") # TODO: handle this more gracefully
         supply_places(get_nearby_places(location.lat, location.lng, 10000, assistant_response.parsed.type), session)
