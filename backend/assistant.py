@@ -7,11 +7,13 @@ from maps import get_nearby_places
 load_dotenv()
 client = OpenAI()
 
+place_types = ['accounting', 'airport', 'amusement_park', 'aquarium', 'art_gallery', 'atm', 'bakery', 'bank', 'bar', 'beauty_salon', 'bicycle_store', 'book_store', 'bowling_alley', 'bus_station', 'cafe', 'campground', 'car_dealer', 'car_rental', 'car_repair', 'car_wash', 'casino', 'cemetery', 'church', 'city_hall', 'clothing_store', 'convenience_store', 'courthouse', 'dentist', 'department_store', 'doctor', 'drugstore', 'electrician', 'electronics_store', 'embassy', 'fire_station', 'florist', 'funeral_home', 'furniture_store', 'gas_station', 'gym', 'hair_care', 'hardware_store', 'hindu_temple', 'home_goods_store', 'hospital', 'insurance_agency', 'jewelry_store', 'laundry', 'lawyer', 'library', 'light_rail_station', 'liquor_store', 'local_government_office', 'locksmith', 'lodging', 'meal_delivery', 'meal_takeaway', 'mosque', 'movie_rental', 'movie_theater', 'moving_company', 'museum', 'night_club', 'painter', 'park', 'parking', 'pet_store', 'pharmacy', 'physiotherapist', 'plumber', 'police', 'post_office', 'primary_school', 'real_estate_agency', 'restaurant', 'roofing_contractor', 'rv_park', 'school', 'secondary_school', 'shoe_store', 'shopping_mall', 'spa', 'stadium', 'storage', 'store', 'subway_station', 'supermarket', 'synagogue', 'taxi_stand', 'tourist_attraction', 'train_station', 'transit_station', 'travel_agency', 'university', 'veterinary_care', 'zoo']
+
 initial_messages = (
     {
         "role": "system",
         "content": 
-            """
+            f"""
             You are an assistant for visually impaired individuals that helps users find places and directions.
             For each response, provide a conversational reply and specify an "intent" a "place" and a "type" of place (as applicable).
             When you detect that the user is interested in places, specify the "intent" as "get_places" and you will then be provided with
@@ -20,8 +22,10 @@ initial_messages = (
 
             - "reply" should be the conversational response to the user's query.
             - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "submit_experience" for submitting a new experience, or "get_experience" for retrieving an experience. 
-            - "type" should be the type of place (such as "restaurant", "park", etc.), if applicable.
+            - "type" should be the type of place (such as "restaurant", "park", MUST BE from the list below), if applicable.
             - "place" should be the place_id field for the specific location discussed, if any.
+
+            Place types: {", ".join(place_types)}
             """
     },
 )
@@ -65,8 +69,8 @@ def query(text, session, location=None, system=False):
     if assistant_response.refusal:
         return None
     session['messages'].append({"role": "assistant", "content": assistant_response.parsed.reply})
-
-    if assistant_response.parsed.intent == "get_places":
+    print(assistant_response.parsed)
+    if assistant_response.parsed.intent == "get_places" and not system:
         if location is None:
             raise ValueError("Location is required to get places.") # TODO: handle this more gracefully
         supply_places(get_nearby_places(location.lat, location.lng, 10000, assistant_response.parsed.type), session)

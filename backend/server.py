@@ -57,6 +57,8 @@ def api():
         '''
             
         if session.get('enroute', False):
+            session['enroute'] = False
+            return make_response(text_to_speech("I'm sorry, I still need to look up the route."))
             # TODO: continue conversation about searching for experience
             pass
         else:
@@ -69,6 +71,7 @@ def api():
             return make_response(text_to_speech(response.reply))
 
     return 'Missing audio or location in request', 400
+
 
 if __name__ == '__main__':  
     app.run(debug=True)

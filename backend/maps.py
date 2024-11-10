@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MAPS_API_KEY = os.getenv("MAPS_API_KEY")
+if not MAPS_API_KEY:
+    raise ValueError("MAPS_API_KEY environment variable not set.")
+
 
 class Location:
     def __init__(self, lat, lng):
@@ -28,11 +31,8 @@ def get_nearby_places(lat, lng, radius, type):
         A list of nearby places, or None if an error occurs.
     """
 
-    api_key = os.environ.get('MAPS_API_KEY')
-    if not api_key:
-        raise ValueError("GOOGLE_MAPS_API_KEY environment variable not set.")
-
-    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type={type}&key={api_key}"
+    
+    url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type={type}&key={MAPS_API_KEY}"
 
     try:
         response = requests.get(url)
@@ -41,6 +41,41 @@ def get_nearby_places(lat, lng, radius, type):
 
         if data['status'] == 'OK':
             return data['results']
+        else:
+            print(f"Error: {data['status']}")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return None
+    
+def get_directions(origin, destination, mode="walking"):
+    """
+    Fetches directions between two locations using the older Google Maps Directions API.
+
+    Args:
+        origin: Starting location as Location.
+        destination: as a place_id str.
+
+    Returns:
+        A list of directions, or None if an error occurs.
+    """
+
+    url = "https://maps.googleapis.com/maps/api/directions/json"
+    params = {
+        "origin": str(origin),
+        "destination": f"place_id:{destination}",
+        "mode": mode,
+        "key": MAPS_API_KEY,
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if data['status'] == 'OK':
+            return data
         else:
             print(f"Error: {data['status']}")
             return None
