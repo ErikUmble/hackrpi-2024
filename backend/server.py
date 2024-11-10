@@ -4,9 +4,7 @@ from flask import (
     request,
     send_from_directory,
     make_response,
-    jsonify,
 )
-from load_firebase import experiences
 from text_to_speech import text_to_speech
 from speech_to_text import speech_to_text
 import os
@@ -15,6 +13,8 @@ import secrets
 import base64
 from maps import Location
 from assistant import query
+import firebase_db
+import random
 
 load_dotenv()
 
@@ -63,10 +63,23 @@ def api():
             response = query(text_transcript, session, location)
             
             # if intent is to get directions, set session['enroute'] to True
-            if response.intent == "directions":
-                session['enroute'] = True
-                # TODO: get directions
-            return make_response(text_to_speech(response.reply))
+            if response.intent == "get_experience":
+                experiences = firebase_db.get_experiences(response.place)
+                # for now, choose a random experience to share
+                # TODO: have a better way to choose
+                chosen_experience = random.choice(experiences)
+                return make_response(chosen_experience['audio'])
+            else:
+                if response.intent == "directions":
+                    session['enroute'] = True
+                    # TODO: get directions
+                elif response.intent == "submit_experience":
+                    firebase_db.submit_experience(
+                        audio_wav_bytes,
+                        text_transcript,
+                        response.place
+                    )
+                return make_response(text_to_speech(response.reply))
 
     return 'Missing audio or location in request', 400
 

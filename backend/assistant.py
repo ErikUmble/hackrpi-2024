@@ -19,7 +19,7 @@ initial_messages = (
             unless the user is unhappy with the current options or want a different type of place options.
 
             - "reply" should be the conversational response to the user's query.
-            - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "submit_experience" for submitting a new experience, or "get_experience" for retrieving an experience. 
+            - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "like_to_submit_experience" for when the person is asking to submit an experience but not describing details, "submit_experience" for when the person is describing food or thoughts about their experience, or "get_experience" for retrieving an experience. 
             - "type" should be the type of place (such as "restaurant", "park", etc.), if applicable.
             - "place" should be the place_id field for the specific location discussed, if any.
             """
