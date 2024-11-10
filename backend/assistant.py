@@ -24,7 +24,7 @@ initial_messages = (
             - "reply" should be the conversational response to the user's query.
             - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "experience_details" for when the person is describing food or thoughts about their experience, or "get_experience" for retrieving an experience. 
             - "type" should be the type of place (such as "restaurant", "park", MUST BE from the list below), if applicable.
-            - "place" should be the place_id field for the specific location discussed, if any.
+            - "place" should be the name of the specific location the user is interested in, if any.
 
             Place types: {", ".join(place_types)}
             """

@@ -11,7 +11,7 @@ import os
 from dotenv import load_dotenv
 import secrets
 import base64
-from maps import Location
+from maps import Location, get_matching_place
 from assistant import query
 import firebase_db
 import random
@@ -66,7 +66,7 @@ def api():
 
             # if intent is to get directions, set session['enroute'] to True
             if response.intent == "get_experience":
-                experiences = firebase_db.get_experiences(response.place)
+                experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place))
                 # for now, choose a random experience to share
                 if len(experiences) == 0:
                     return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet'))
@@ -81,7 +81,7 @@ def api():
                     firebase_db.submit_experience(
                         audio_wav_bytes,
                         text_transcript,
-                        response.place
+                        get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
                     )
                 return make_response(text_to_speech(response.reply))
 

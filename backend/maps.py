@@ -83,3 +83,36 @@ def get_directions(origin, destination, mode="walking"):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
         return None
+
+def get_matching_place(lat, lng, query):
+    """
+    Returns the place_id of the place that best matches the name, near the current location.
+    """
+
+    url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+    params = {
+        "query": query,
+        "location": f"{lat},{lng}",
+        "key": MAPS_API_KEY,
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if data['status'] == 'OK':
+            places = response.json().get("results", [])
+
+            # Get the best matching place (first result)
+            if places:
+                best_match = places[0]  # Best match is typically the first result
+                place_id = best_match.get("place_id")
+                return place_id
+        else:
+            print(f"Error: {data['status']}")
+            return None
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        return None
