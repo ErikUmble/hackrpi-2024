@@ -11,7 +11,7 @@ COPY frontend/package*.json ./
 RUN npm install
 
 # Copy the rest of the frontend source
-COPY frontend .
+COPY . .
 
 # Build the Quasar app
 RUN npx quasar build
@@ -25,10 +25,6 @@ WORKDIR /app
 
 # Copy the built frontend from previous stage
 COPY --from=frontend-builder /app/frontend/dist/spa /app/frontend/dist/spa
-
-# Copy backend files
-COPY backend /app/backend
-COPY .env /app/.env
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r backend/requirements.txt
