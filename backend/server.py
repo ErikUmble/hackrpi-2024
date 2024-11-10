@@ -61,11 +61,13 @@ def api():
             pass
         else:
             response = query(text_transcript, session, location)
-            
+
             # if intent is to get directions, set session['enroute'] to True
             if response.intent == "get_experience":
                 experiences = firebase_db.get_experiences(response.place)
                 # for now, choose a random experience to share
+                if len(experiences) == 0:
+                    return make_response(text_to_speech('Sorry, we do not have any experiences for that location yet'))
                 # TODO: have a better way to choose
                 chosen_experience = random.choice(experiences)
                 return make_response(chosen_experience['audio'])
@@ -73,7 +75,7 @@ def api():
                 if response.intent == "directions":
                     session['enroute'] = True
                     # TODO: get directions
-                elif response.intent == "submit_experience":
+                elif response.intent == "experience_details":
                     firebase_db.submit_experience(
                         audio_wav_bytes,
                         text_transcript,
