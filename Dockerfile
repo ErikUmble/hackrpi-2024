@@ -1,7 +1,7 @@
 # Build stage for frontend
 FROM node:16 as frontend-builder
 
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Install quasar CLI globally
 RUN npm install -g @quasar/cli
@@ -12,6 +12,8 @@ RUN npm install
 
 # Copy the rest of the frontend source
 COPY . .
+
+WORKDIR /app/frontend
 
 # Build the Quasar app
 RUN npx quasar build
