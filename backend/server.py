@@ -50,8 +50,6 @@ def api():
             return 'We had trouble converting that audio', 400
         text_transcript = ''.join([result.alternatives[0].transcript for result in text_results]) # take the most confident text result
         language_code = text_results[0].language_code
-        print(text_results)
-        print(text_transcript)
         location = Location(request.form['latitude'], request.form['longitude'])
 
         '''
@@ -64,7 +62,7 @@ def api():
 
         # if intent is to get directions, set session['enroute'] to True
         if response.intent == "get_experience":
-            experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0])
+            experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0], language_code)
             # for now, choose a random experience to share
             if experiences is None or len(experiences) == 0:
                 return make_response(sorry_message_in_language(language_code))
@@ -86,7 +84,8 @@ def api():
                 firebase_db.submit_experience(
                     audio_wav_bytes,
                     text_transcript,
-                    get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0]
+                    get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0],
+                    language_code,
                 )
 
             return make_response(text_to_speech(response.reply, language_code))

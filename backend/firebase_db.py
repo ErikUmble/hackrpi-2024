@@ -16,7 +16,7 @@ default_app = firebase_admin.initialize_app(credentials_object, {
 experiences = db.reference('experiences')
 
 # submit an experience
-def submit_experience(original_audio, transcribed, location):
+def submit_experience(original_audio, transcribed, location, language_code):
     if location is None:
         return
     experiences.push(
@@ -24,13 +24,17 @@ def submit_experience(original_audio, transcribed, location):
             'audio': base64.b64encode(original_audio).decode('utf8'),
             'transcription': transcribed,
             'location': location,
+            'language': language_code,
         }
     )
 
-def get_experiences(location):
+def get_experiences(location, language_code):
     if location is None:
-        return None
+        return []
+    print(f'location: {location}, language: {language_code}')
     results = list(experiences.order_by_child('location').equal_to(location).get().values())
     for index in range(len(results)):
         results[index]['audio'] = base64.b64decode(results[index]['audio'])
+    # filter by language
+    results = list(filter(lambda result: result['language'] == language_code, results))
     return results

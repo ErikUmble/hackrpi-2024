@@ -26,7 +26,7 @@ initial_messages = (
             experience, the intent should be "info" and you should expect details about the experience in the following response.
 
             - "reply" should be the conversational response to the user's query; this will be provided as audio via text-to-speech, so aim to use simple text, be concise, and give the user an option to ask for more information.
-            - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "experience_details" for when the person is describing food or thoughts about their experience at a place, or "get_experience" for retrieving an experience. 
+            - "intent" should be "get_places" if the user wants to learn about places in the area, "info" for general information requests about places already shared, "directions" for route directions, "experience_details" for when the person is describing food or thoughts about their experience at a place, or "get_experience" for when the person is asking to hear an experience. 
             - "type" should be the type of place (such as "restaurant", "park", MUST BE from the list below), if applicable.
             - "distance" in meters should be the radius of the search area for places. Assume 2000 by default, and adjust if the user is curious about more options or specifies that they want a shorter walk. Do not go above 10000 or below 500.
             - "place" should be the name of the specific location the user is interested in, if any.
