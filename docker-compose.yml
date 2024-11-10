@@ -9,7 +9,9 @@ services:
       - reverse_proxy_net
     env_file:
       - .env
-      
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=able-81a4e-e694abda18d2.json
+
   reverse_proxy:
     image: nginx:latest
     container_name: nginx_reverse_proxy
