@@ -92,7 +92,6 @@ const sendRecording = async (blob: Blob): Promise<void> => {
     // Replace with your API endpoint
     const response = await fetch('/api', {
       method: 'POST',
-      mode: "cors",
       body: formData
     })
 
