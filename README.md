@@ -4,7 +4,7 @@ Ask about the places nearby and hear experiences from other community members (i
 Motivate and encourage each other to keep exploring and enjoying the city in spite of vision difficulties. 
 Use your native language and hear results and experiences in that language.
 
-Try it [here](https://able.erikumble.com/).
+Try it [here](https://ablemap.tech/).
 
 ## HackRPI 2024
 HackRPI is RPI's annual hackathon. Participants form teams up to 4 people and spend up to 24 hours 
