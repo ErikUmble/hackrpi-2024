@@ -48,9 +48,10 @@ def api():
         text_results = speech_to_text(audio_wav_bytes)
         if len(text_results) == 0:
             text_transcript = 'We had trouble converting that audio.'
+            language_code = 'en-us'
         else:
             text_transcript = ''.join([result.alternatives[0].transcript for result in text_results]) # take the most confident text result
-        language_code = text_results[0].language_code
+            language_code = text_results[0].language_code
         location = Location(request.form['latitude'], request.form['longitude'])
 
         '''
