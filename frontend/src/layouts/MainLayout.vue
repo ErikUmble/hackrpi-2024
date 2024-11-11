@@ -5,8 +5,7 @@
         <q-toolbar-title>
           Able
         </q-toolbar-title>
-        <router-link to="/" class="q-mr-md text-white">Home</router-link>
-        <router-link to="/about" class="text-white">About</router-link>
+        <a href="https://github.com/ErikUmble/hackrpi-2024" target="_blank" rel="noopener noreferrer" class="text-white">About</a>
       </q-toolbar>
     </q-header>
 

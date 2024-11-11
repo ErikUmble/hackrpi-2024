@@ -35,13 +35,9 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 
 EXPOSE 9000
 
+# Update these as needed
 ENV GOOGLE_APPLICATION_CREDENTIALS=able-81a4e-e694abda18d2.json
-
 COPY able-81a4e-e694abda18d2.json /app/able-81a4e-e694abda18d2.json
 COPY able-81a4e-12feecc4ad04.json /app/able-81a4e-12feecc4ad04.json
-
-# copy ssl certs
-COPY ./fullchain.pem /etc/nginx/ssl/fullchain.pem;
-COPY ./privkey.pem /etc/nginx/ssl/privkey.pem;
 
 CMD ["python", "backend/server.py"]
