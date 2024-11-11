@@ -11,18 +11,3 @@ services:
       - .env
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=able-81a4e-e694abda18d2.json
-
-  reverse_proxy:
-    image: nginx:latest
-    container_name: nginx_reverse_proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - reverse_proxy_net
-
-networks:
-  reverse_proxy_net:
-    name: reverse_proxy_net
