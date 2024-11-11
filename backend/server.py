@@ -8,7 +8,7 @@ from flask import (
 )
 from urllib.parse import quote
 from text_to_speech import text_to_speech, sorry_message_in_language
-from speech_to_text import get_text_transcript_and_language_code
+from speech_to_text import get_text_transcript_and_language_code, AudioConversion
 import os
 from dotenv import load_dotenv
 import secrets
@@ -45,10 +45,10 @@ def api():
         # pass audio through speech to text
         audio_wav_file = request.files['audio']
         audio_wav_bytes = audio_wav_file.read()
-        results = get_text_transcript_and_language_code(audio_wav_bytes)
-        text_transcript = results['transcript']
-        language_code = results['language']
-        conversion_success = results['success']
+        conversion = get_text_transcript_and_language_code(audio_wav_bytes)
+        text_transcript = conversion.transcript
+        language_code = conversion.language_code
+        conversion_success = conversion.success
         location = Location(request.form['latitude'], request.form['longitude'])
 
         # if successfully converted speech, send to ChatGPT
