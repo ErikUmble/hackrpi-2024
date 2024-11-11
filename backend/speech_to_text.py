@@ -26,6 +26,7 @@ def speech_to_text(audio_bytes):
 def get_text_transcript_and_language_code(audio_bytes):
     try:
         text_results = speech_to_text(audio_bytes)
+        print(text_results)
         if len(text_results) == 0:
             return {
                 'success': False,
