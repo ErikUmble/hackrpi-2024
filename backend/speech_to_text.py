@@ -1,4 +1,5 @@
 from google.cloud import speech
+from google.api_core.exceptions import InvalidArgument, PermissionDenied, ResourceExhausted
 
 stt_client = speech.SpeechClient()
 
@@ -19,6 +20,11 @@ def speech_to_text(audio_bytes):
         content=audio_bytes,
     )
 
-    response = stt_client.recognize(config=config, audio=audio)
-
-    return response.results
+    try:
+        return stt_client.recognize(config=config, audio=audio)
+    except InvalidArgument:
+        return "Sorry, there was a server error processing that audio."
+    except PermissionDenied:
+        return "Sorry, there was a server permissions error."
+    except ResourceExhausted:
+        return "Sorry, we've exhausted our resources. Try again later."
