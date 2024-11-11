@@ -18,7 +18,8 @@ Joel McCandless & Erik Umble
 ## Hosting
 Able works by tying together a bunch of incredible APIs. We're standing on the shoulders of giants to create
 something like this in just 24 hours. As such, if you would like to host an instance of Able yourself, you
-are going to need to get an API key from OpenAI, Google Maps, Firebase, and Google Speech-to-Text.
+are going to need to get an API key from OpenAI, Google Maps, Firebase Admin, Google Speech-to-Text, and Google
+Speech (for text to speech).
 
 Clone this repository.
 
@@ -31,10 +32,15 @@ FIREBASE_DB_URL=<Your Firebase db url>
 OPENAI_API_KEY=<Your OpenAI key>
 FLASK_KEY=<long random key>
 ```
-You also need to update `Dockerfile` and `docker-compose.yml` with your GOOGLE_APPLICATION_CREDENTIALS filepath
-and Firebase credentials path.
+We used a Google Cloud project with service accounts which have roles (permissions) enabling them to use
+Firebase Admin, Google Speech-to-Text, and Google Speech. Service agents authenticate via a .json credentials
+file. If you also use a Google Cloud Project, you'll need to share the path to your credentials
+files in the `.env` file where we indicate `<JSON filename>`. You also need to update `Dockerfile` and
+`docker-compose.yml` with your GOOGLE_APPLICATION_CREDENTIALS filepath and Firebase credentials path.
 Note that you need to configure the Google Maps key to enable Places Search and Text Search. Firebase and
 Google Application Credentials are best kept in their provided JSON files, and pointed to by this `.env`.
+If you choose not to use a Google Cloud project, you'll be authenticating to the Google Cloud API in a
+different way and may not need the Google and Firebase json files.
 
 Now you can run
 ```bash
