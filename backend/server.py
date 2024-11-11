@@ -8,7 +8,7 @@ from flask import (
 )
 from urllib.parse import quote
 from text_to_speech import text_to_speech, sorry_message_in_language
-from speech_to_text import speech_to_text
+from speech_to_text import get_text_transcript_and_language_code
 import os
 from dotenv import load_dotenv
 import secrets
@@ -45,52 +45,48 @@ def api():
         # pass audio through speech to text
         audio_wav_file = request.files['audio']
         audio_wav_bytes = audio_wav_file.read()
-        text_results = speech_to_text(audio_wav_bytes)
-        if len(text_results) == 0:
-            text_transcript = 'We had trouble converting that audio.'
-            language_code = 'en-us'
-        else:
-            text_transcript = ''.join([result.alternatives[0].transcript for result in text_results]) # take the most confident text result
-            language_code = text_results[0].language_code
+        results = get_text_transcript_and_language_code(audio_wav_bytes)
+        text_transcript = results['transcript']
+        language_code = results['language']
+        conversion_success = results['success']
         location = Location(request.form['latitude'], request.form['longitude'])
 
-        '''
-        # for testing, convert text back into audio and return
-        audio_response = text_to_speech(text_transcript)
-        return make_response(audio_response)
-        '''
-            
-        response = query(text_transcript, session, location)
-
-        # if intent is to get directions, set session['enroute'] to True
-        if response.intent == "get_experience":
-            experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0], language_code)
-            # for now, choose a random experience to share
-            if experiences is None or len(experiences) == 0:
-                return make_response(sorry_message_in_language(language_code))
-            # TODO: have a better way to choose
-            chosen_experience = random.choice(experiences)
-            return make_response(chosen_experience['audio'])
-        else:
-            if response.intent == "directions":
-                place_id, name = get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
-                google_maps_link = f'https://www.google.com/maps/dir/?api=1&destination={quote(name)}&destination_place_id={quote(place_id)}&travelmode=walking&dir_action=navigate'
-                return make_response(
-                    jsonify(
-                        {
-                            'link': google_maps_link,
-                        }
+        # if successfully converted speech, send to ChatGPT
+        if conversion_success:
+            response = query(text_transcript, session, location)
+            # if intent is to get directions, set session['enroute'] to True
+            if response.intent == "get_experience":
+                experiences = firebase_db.get_experiences(get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0], language_code)
+                # for now, choose a random experience to share
+                if experiences is None or len(experiences) == 0:
+                    return make_response(sorry_message_in_language(language_code))
+                # TODO: have a better way to choose
+                chosen_experience = random.choice(experiences)
+                return make_response(chosen_experience['audio'])
+            else:
+                if response.intent == "directions":
+                    place_id, name = get_matching_place(lat=location.lat, lng=location.lng, query=response.place)
+                    google_maps_link = f'https://www.google.com/maps/dir/?api=1&destination={quote(name)}&destination_place_id={quote(place_id)}&travelmode=walking&dir_action=navigate'
+                    return make_response(
+                        jsonify(
+                            {
+                                'link': google_maps_link,
+                            }
+                        )
                     )
-                )
-            elif response.intent == "experience_details":
-                firebase_db.submit_experience(
-                    audio_wav_bytes,
-                    text_transcript,
-                    get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0],
-                    language_code,
-                )
+                elif response.intent == "experience_details":
+                    firebase_db.submit_experience(
+                        audio_wav_bytes,
+                        text_transcript,
+                        get_matching_place(lat=location.lat, lng=location.lng, query=response.place)[0],
+                        language_code,
+                    )
 
-            return make_response(text_to_speech(response.reply, language_code))
+                return make_response(text_to_speech(response.reply, language_code))
+        else:
+            # if converting speech was unsuccessful, send error message from conversion
+            response = text_transcript
+            return make_response(text_to_speech(response, language_code))
 
     return 'Missing audio or location in request', 400
 
