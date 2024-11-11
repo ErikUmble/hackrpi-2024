@@ -4,7 +4,7 @@ Ask about the places nearby and hear experiences from other community members (i
 Motivate and encourage each other to keep exploring and enjoying the city in spite of vision difficulties. 
 Use your native language and hear results and experiences in that language.
 
-Try it [https://able.erikumble.com/](here).
+Try it [here](https://able.erikumble.com/).
 
 ## HackRPI 2024
 HackRPI is RPI's annual hackathon. Participants form teams up to 4 people and spend up to 24 hours 
@@ -50,7 +50,7 @@ to other devices yet. You need a webserver (such as nginx) to proxy connections 
 
 Since Able requires microphone and location access, your users must connect over https for browsers such
 as Chrome or Edge to allow those permissions at all. If you don't have SSL certificates for your domain yet,
-we recommend following the instructions from [https://letsencrypt.org/](letsencrypt). 
+we recommend following the instructions from [letsencrypt](https://letsencrypt.org/). 
 
 To proxy connections to Flask, you will need to add something like the following to the nginx conf file
 your server is using.
