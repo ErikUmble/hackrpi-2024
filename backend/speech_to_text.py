@@ -1,17 +1,26 @@
 from google.cloud import speech
 from google.api_core.exceptions import InvalidArgument, PermissionDenied, ResourceExhausted
+import fleep
 
 stt_client = speech.SpeechClient()
 
 def speech_to_text(audio_bytes):
 
-    '''
-    config = speech.RecognitionConfig(
-        language_code="en",
-    )
-    '''
+    info = fleep.get(audio_bytes)
+
+    supported_encodings = {
+        'wav': speech.RecognitionConfig.AudioEncoding.LINEAR16,
+        'webm': speech.RecognitionConfig.AudioEncoding.WEBM_OPUS,
+        'oga': speech.RecognitionConfig.AudioEncoding.OGG_OPUS,
+    }
+
+    if info.extension[0] in supported_encodings:
+        audio_encoding = supported_encodings[info.extension[0]]
+    else:
+        raise InvalidArgument(f'Audio came in in wrong encoding: {info.extension}')
 
     config = speech.RecognitionConfig(
+        encoding=audio_encoding,
         language_code='en-US',
         alternative_language_codes=["es-ES", "fr-FR", "zh-CN"],
     )

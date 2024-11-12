@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { MediaRecorder, register } from 'extendable-media-recorder';
 
 interface Location {
   latitude: number
@@ -40,7 +41,8 @@ const setupLocationWatcher = (): void => {
 const initializeRecorder = async (): Promise<void> => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    mediaRecorder.value = new MediaRecorder(stream)
+    const mimeType = MediaRecorder.isTypeSupported('audio/wav') ? 'audio/wav' : 'audio/webm';
+    mediaRecorder.value = new MediaRecorder(stream, { mimeType })
     
     mediaRecorder.value.ondataavailable = (event: BlobEvent) => {
       audioChunks.value.push(event.data)
