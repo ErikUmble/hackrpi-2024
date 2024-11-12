@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { MediaRecorder, register } from 'extendable-media-recorder';
 
 interface Location {
   latitude: number
