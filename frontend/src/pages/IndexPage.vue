@@ -47,7 +47,7 @@ const initializeRecorder = async (): Promise<void> => {
     }
     
     mediaRecorder.value.onstop = async () => {
-      const audioBlob = new Blob(audioChunks.value, { type: 'audio/wav' })
+      const audioBlob = new Blob(audioChunks.value)
       await sendRecording(audioBlob)
       audioChunks.value = []
     }
